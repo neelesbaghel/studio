@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 
 // Define available tones and languages
 const poemTones = ['Let AI Decide', 'Reflective', 'Happy', 'Sad', 'Romantic', 'Humorous', 'Mysterious', 'Hopeful', 'Nostalgic'];
-const poemLanguages = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Italian', 'Portuguese', 'Russian'];
+const poemLanguages = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Italian', 'Portuguese', 'Russian', 'Hindi']; // Added Hindi
 
 export default function Home() {
   const [photo, setPhoto] = useState<File | null>(null);
