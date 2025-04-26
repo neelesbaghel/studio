@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea'; // Import Textarea
 import {
   Select,
   SelectContent,
@@ -13,14 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Upload, BookOpen, Languages, Smile } from 'lucide-react';
+import { Loader2, Upload, BookOpen, Languages, Smile, MessageSquareText } from 'lucide-react'; // Added MessageSquareText icon
 import Image from 'next/image';
 import { generatePoem } from '@/ai/flows/generate-poem';
 import { useToast } from '@/hooks/use-toast';
 
 // Define available tones and languages
 const poemTones = ['Let AI Decide', 'Reflective', 'Happy', 'Sad', 'Romantic', 'Humorous', 'Mysterious', 'Hopeful', 'Nostalgic'];
-const poemLanguages = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Italian', 'Portuguese', 'Russian', 'Hindi']; // Added Hindi
+const poemLanguages = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Italian', 'Portuguese', 'Russian', 'Hindi'];
 
 export default function Home() {
   const [photo, setPhoto] = useState<File | null>(null);
@@ -30,6 +31,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTone, setSelectedTone] = useState<string | undefined>(poemTones[0]); // Default to 'Let AI Decide'
   const [selectedLanguage, setSelectedLanguage] = useState<string>(poemLanguages[0]); // Default to English
+  const [sceneDescription, setSceneDescription] = useState<string>(''); // State for scene description
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -77,6 +79,7 @@ export default function Home() {
         photoDataUri: photoPreview,
         tone: toneToPass,
         language: selectedLanguage,
+        description: sceneDescription || undefined, // Pass description if it exists
        });
       setPoemTitle(result.title);
       setPoem(result.poem);
@@ -108,10 +111,10 @@ export default function Home() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
           {/* Controls and Photo Upload Section */}
-          <div className="flex flex-col space-y-6">
+          <div className="flex flex-col space-y-4"> {/* Adjusted spacing */}
              {/* Upload Area */}
             <div className="space-y-2">
-              <Label htmlFor="photo-upload" className="text-lg font-semibold text-secondary-foreground flex items-center gap-2">
+              <Label htmlFor="photo-upload" className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Upload className="h-5 w-5" /> Upload Your Inspiration
               </Label>
               <div
@@ -147,9 +150,26 @@ export default function Home() {
               />
             </div>
 
+            {/* Scene Description */}
+            <div className="space-y-2">
+              <Label htmlFor="scene-description" className="font-semibold text-foreground flex items-center gap-2">
+                <MessageSquareText className="h-5 w-5" /> Describe the Scene (Optional)
+              </Label>
+              <Textarea
+                id="scene-description"
+                placeholder="e.g., A serene sunset over a calm lake, casting long shadows..."
+                value={sceneDescription}
+                onChange={(e) => setSceneDescription(e.target.value)}
+                className="resize-none"
+                rows={3}
+                maxLength={300} // Optional: limit description length
+              />
+              <p className="text-xs text-muted-foreground text-right">{sceneDescription.length}/300</p>
+            </div>
+
             {/* Tone Selection */}
             <div className="space-y-2">
-              <Label htmlFor="tone-select" className="font-semibold text-secondary-foreground flex items-center gap-2">
+              <Label htmlFor="tone-select" className="font-semibold text-foreground flex items-center gap-2">
                 <Smile className="h-5 w-5" /> Select Tone (Optional)
               </Label>
               <Select value={selectedTone} onValueChange={setSelectedTone}>
@@ -166,7 +186,7 @@ export default function Home() {
 
              {/* Language Selection */}
              <div className="space-y-2">
-               <Label htmlFor="language-select" className="font-semibold text-secondary-foreground flex items-center gap-2">
+               <Label htmlFor="language-select" className="font-semibold text-foreground flex items-center gap-2">
                  <Languages className="h-5 w-5" /> Select Language
                </Label>
                <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
@@ -185,7 +205,7 @@ export default function Home() {
               <Button
                 onClick={handleGeneratePoem}
                 disabled={!photo || isLoading}
-                className="w-full mt-4 text-lg py-3"
+                className="w-full mt-4 text-lg py-3" // Added mt-4 for spacing
                 size="lg"
                >
                 {isLoading ? (
@@ -204,12 +224,12 @@ export default function Home() {
 
           {/* Poem Display Section */}
           <div className="flex flex-col space-y-2">
-             <Label htmlFor="poem-output" className="text-lg font-semibold text-secondary-foreground mb-2">
+             <Label htmlFor="poem-output" className="text-lg font-semibold text-foreground mb-2">
               Your Poem
             </Label>
             <Card
               id="poem-output"
-              className={`w-full h-auto min-h-[20rem] md:min-h-[28rem] p-4 bg-muted overflow-y-auto transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center shadow-inner ${poem || isLoading ? 'opacity-100' : 'opacity-60'}`}
+              className={`w-full h-auto min-h-[20rem] md:min-h-[calc(100%-2rem)] p-4 bg-muted overflow-y-auto transition-opacity duration-500 ease-in-out flex flex-col items-center justify-center shadow-inner ${poem || isLoading ? 'opacity-100' : 'opacity-60'}`} // Adjusted min-height
               aria-live="polite"
              >
                {isLoading ? (
@@ -223,7 +243,7 @@ export default function Home() {
                    <pre className="whitespace-pre-wrap font-sans text-sm text-foreground">{poem}</pre>
                   </div>
                ) : (
-                 <p className="text-muted-foreground text-center italic">Upload a photo and click "Generate Poem" to see the magic happen here.</p>
+                 <p className="text-muted-foreground text-center italic">Upload a photo, add an optional description, and click "Generate Poem" to see the magic happen here.</p> // Updated placeholder text
                )}
              </Card>
           </div>
